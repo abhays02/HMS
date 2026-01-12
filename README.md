@@ -71,12 +71,75 @@ The system uses a normalized relational schema to enforce strict RBAC and Data O
 ### Entity Relationship Diagram (ERD)
 
 ```
-User ||--o{ AuditLog : generates
-User ||--o{ Patient : manages
-User }|--|| Role : has
-User }|--|| Team : belongs_to
-User }|--|| Location : based_in
-Role }|--|{ Permission : contains
+erDiagram
+    User ||--o{ AuditLog : "generates"
+    User ||--o{ Patient : "manages"
+    User }|--|| Role : "has"
+    User }|--|| Team : "belongs_to"
+    User }|--|| Location : "based_in"
+    Role ||--o| Role : "parent_of"
+    Role }|--|{ Permission : "has"
+    Role ||--o{ RolePermissions : "maps"
+    Permission ||--o{ RolePermissions : "maps"
+
+    User {
+        int id PK
+        string email UK
+        string password_hash
+        boolean is_active
+        int role_id FK
+        int location_id FK
+        int team_id FK
+        string full_name
+        string phone_number
+        int failed_login_attempts
+        datetime locked_until
+    }
+
+    Patient {
+        int id PK
+        string patient_id "Unencrypted Index"
+        string first_name "Encrypted"
+        string last_name "Encrypted"
+        string dob "Encrypted"
+        string gender "Encrypted"
+        int manager_id FK
+    }
+
+    AuditLog {
+        int id PK
+        int user_id FK
+        string action
+        string details
+        datetime timestamp
+    }
+
+    Role {
+        int id PK
+        string name UK
+        int parent_id FK "Self-reference"
+    }
+
+    Permission {
+        int id PK
+        string name UK
+        string description
+    }
+
+    RolePermissions {
+        int role_id FK
+        int permission_id FK
+    }
+
+    Team {
+        int id PK
+        string name UK
+    }
+
+    Location {
+        int id PK
+        string name UK
+    }
 ```
 
 ### Table Definitions
@@ -103,7 +166,7 @@ SECRET_KEY=your-secret-key-for-jwt-signing
 ENCRYPTION_KEY=your-fernet-encryption-key
 
 # OTP Configuration (for password reset)
-BACKUP_OTP_CODE=123456
+BACKUP_OTP_CODE=
 ```
 
 ### Generating Keys
