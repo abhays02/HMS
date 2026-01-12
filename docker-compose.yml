@@ -1,0 +1,53 @@
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    # seed_correct logic is now part of init_db.
+    command: sh -c "python -m app.init_db && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./backend:/app
+      - ./.env:/app/.env
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db/${DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      # Load from .env file
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - BACKUP_OTP_CODE=${BACKUP_OTP_CODE}
+      # Seed users from env (no hardcoded credentials)
+      - DEFAULT_USER_PASSWORD=${DEFAULT_USER_PASSWORD}
+      - SEED_USERS=${SEED_USERS}
+
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # Volumes removed to ensure the production build inside the image is used.
+    # To develop locally, use 'npm run dev' on host or uncomment lines below and change CMD in Dockerfile.
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+        - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,69 @@
+# Environment files
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Test data (generated)
+backend/tests/data/*.xlsx
+
+# Node modules (if any at root)
+frontend/node_modules
+
+# Byte-compiled files
+*.pyc
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# README files in subdirectories
+frontend/README.md
+MASTER_README.md
